@@ -2,6 +2,7 @@ const express = require('express');
 const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
 const Leaders = require('../models/leaders');
+var authenticate = require('../authenticate');
 
 const leaderRouter = express.Router();
 
@@ -29,7 +30,7 @@ leaderRouter.route('/(:leaderID)?')
 	.catch((err) => next(err));
     }
 })
-.post((req, res, next) => {
+.post(authenticate.verifyUser, (req, res, next) => {
 	if(req.params.leaderID){
 		res.statusCode = 403;
 		res.end('POST operation not supported on /leaders/' + req.params.leaderID);
@@ -45,7 +46,7 @@ leaderRouter.route('/(:leaderID)?')
 	.catch((err) => next(err));
     }
 })
-.put((req, res, next) => {
+.put(authenticate.verifyUser, (req, res, next) => {
 	if(req.params.leaderID){
 		Leaders.findByIdAndUpdate(req.params.leaderID, {
 			$set: req.body
@@ -63,7 +64,7 @@ leaderRouter.route('/(:leaderID)?')
 	res.end('PUT operation bot supported on leaders');
     }
 })
-.delete((req, res, next) => {
+.delete(authenticate.verifyUser, (req, res, next) => {
 	if(req.params.leaderID){
 		Leaders.findByIdAndRemove(req.params.leaderID)
 		.then((resp) => {
